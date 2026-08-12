@@ -21,7 +21,7 @@ jobs:
 
       - name: Setup Node.js
         id: setup-node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v7
         with:
           node-version-file: package.json
           cache: npm
@@ -66,7 +66,7 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12.3' # Use the exact same version as currently in effect for ubuntu-latest
 
