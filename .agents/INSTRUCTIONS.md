@@ -132,6 +132,14 @@ managed locally (e.g. via `fnm`), switch to 24 before running any of the above.
    "no known vulnerabilities" and will happily select a major version that
    breaks the module system for this repository. Cross-check against each
    package's changelog first.
+1. **Assuming `windows-latest` in `ci.yml` doesn't have `pipx` preinstalled.**
+   It does (see
+   [actions/runner-images](https://github.com/actions/runner-images)) — but only
+   against the image's cached default Python patch version. `ci.yml` pins an
+   exact patch (`3.12.3`) for parity with `ubuntu-latest`; if that stops
+   matching what's cached, `setup-python` deletes the cached interpreter and
+   downloads a fresh one with no `pipx` registered against it, which is why that
+   job installs `pipx` explicitly instead of relying on the image.
 
 ## Links
 
