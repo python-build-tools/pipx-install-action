@@ -4,7 +4,6 @@
 const path = require('path')
 const fs = require('fs')
 const core = require('@actions/core')
-const github = require('@actions/github')
 const yaml = require('js-yaml')
 const main = require('../src/main')
 
@@ -45,11 +44,6 @@ describe('action', () => {
   })
 
   it('logs if nothing to do', async () => {
-    // Mock the action's payload
-    github.context.payload = {
-      actor: 'mona'
-    }
-
     await main.run()
 
     expect(runMock).toHaveReturned()
@@ -58,11 +52,6 @@ describe('action', () => {
 
   it('sets a failed status', async () => {
     inputs['install-config-file'] = 'failfail.fail'
-
-    // Mock the action's payload
-    github.context.payload = {
-      actor: 'mona'
-    }
 
     await main.run()
 

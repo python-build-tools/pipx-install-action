@@ -1,8 +1,8 @@
-# [pipx-install GitHub Action](https://github.com/brandonlwhite/pipx-install-action)
+# [pipx-install GitHub Action](https://github.com/python-build-tools/pipx-install-action)
 
-[![GitHub Super-Linter](https://github.com/brandonlwhite/pipx-install-action/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
-![CI](https://github.com/brandonlwhite/pipx-install-action/actions/workflows/ci.yml/badge.svg)
-![Test Converage](https://raw.githubusercontent.com/BrandonLWhite/pipx-install-action/main/badges/coverage.svg)
+[![GitHub Super-Linter](https://github.com/python-build-tools/pipx-install-action/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
+![CI](https://github.com/python-build-tools/pipx-install-action/actions/workflows/ci.yml/badge.svg)
+![Test Converage](https://raw.githubusercontent.com/python-build-tools/pipx-install-action/main/badges/coverage.svg)
 
 This action installs Python tools using [pipx](https://github.com/pypa/pipx).
 
@@ -32,7 +32,7 @@ Here's an example of how to use this action in a workflow file:
 ```yaml
 steps:
   - name: Install Python Tools
-    uses: BrandonLWhite/pipx-install-action
+    uses: python-build-tools/pipx-install-action
 ```
 
 Tool packages are expressed in your project's `pyproject.toml` file
