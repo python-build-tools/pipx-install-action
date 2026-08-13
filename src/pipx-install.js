@@ -45,7 +45,8 @@ export async function pipxInstall(options) {
     pipx: pipxVersion,
     python: pythonVersion,
     imageVersion: process.env.ImageVersion,
-    imageOs: process.env.ImageOS
+    imageOs: process.env.ImageOS,
+    salt: 'verify-windows-cache-save-2'
   }
 
   const pipxSharedCacheKey = `pipx-install-shared-${hashObject(
