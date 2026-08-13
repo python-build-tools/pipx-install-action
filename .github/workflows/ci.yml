@@ -66,20 +66,6 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v7
-        with:
-          python-version: '3.12.3' # Use the exact same version as currently in effect for ubuntu-latest
-
-      # windows-latest DOES ship pipx preinstalled (see actions/runner-images),
-      # but only against its cached default Python patch version. Pinning an
-      # exact patch above (3.12.3) that doesn't match what's cached forces
-      # setup-python to delete the cached interpreter and download a fresh
-      # one, which has no pipx registered against it -- hence installing it
-      # explicitly here rather than relying on the image.
-      - name: Install pipx
-        id: install-pipx
-        run: pip install pipx
-
       - run: cp __tests__/data/pyproject.test1.toml pyproject.toml
 
       - name: Test Local Action

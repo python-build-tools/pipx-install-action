@@ -132,14 +132,19 @@ managed locally (e.g. via `fnm`), switch to 24 before running any of the above.
    "no known vulnerabilities" and will happily select a major version that
    breaks the module system for this repository. Cross-check against each
    package's changelog first.
-1. **Assuming `windows-latest` in `ci.yml` doesn't have `pipx` preinstalled.**
-   It does (see
-   [actions/runner-images](https://github.com/actions/runner-images)) — but only
-   against the image's cached default Python patch version. `ci.yml` pins an
-   exact patch (`3.12.3`) for parity with `ubuntu-latest`; if that stops
-   matching what's cached, `setup-python` deletes the cached interpreter and
-   downloads a fresh one with no `pipx` registered against it, which is why that
-   job installs `pipx` explicitly instead of relying on the image.
+1. **Adding an `actions/setup-python` step to the `windows-latest` job in
+   `ci.yml`.** Don't — it's deliberately absent, mirroring `ubuntu-latest`,
+   which also has none. Both images ship `pipx` preinstalled (see
+   [actions/runner-images](https://github.com/actions/runner-images)), but only
+   against each image's own cached default Python patch version (`3.12.3` on
+   Ubuntu, `3.12.10` on Windows as of this writing — the two drift
+   independently). Pinning an exact patch via `setup-python` that doesn't match
+   what's cached makes it delete the cached interpreter and download a fresh one
+   with no `pipx` registered against it. An earlier version of this job did
+   exactly that (to reproduce a now-fixed cross-platform cache-key collision bug
+   — see `imageOs`/`imageVersion` in `pipx-install.js` and the
+   `ImageOS`/`ImageVersion` cases in `pipx-install.test.js`, which cover that
+   regression directly); it's no longer needed and was removed.
 
 ## Links
 
