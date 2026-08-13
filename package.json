@@ -75,7 +75,7 @@
     "@babel/eslint-parser": "^7.28.4",
     "@babel/preset-env": "^7.28.3",
     "@eslint/compat": "^2.1.0",
-    "@vercel/ncc": "^0.38.3",
+    "@vercel/ncc": "^0.44.1",
     "babel-preset-jest": "^29.6.3",
     "eslint": "^9.35.0",
     "eslint-config-prettier": "^10.1.8",
