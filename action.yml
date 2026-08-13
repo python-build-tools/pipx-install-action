@@ -1,4 +1,4 @@
-name: Install Python Tools
+name: Install Python Tools with pipx
 description: Install Python CLI packages with pipx
 author: brandonlwhite@gmail.com
 branding:
