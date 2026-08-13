@@ -1,14 +1,14 @@
-# Repo instructions
+# Repository instructions
 
-## What this repo is
+## What this repository is
 
 `pipx-install-action` is a GitHub Action (plain JavaScript/CommonJS, run on
-Node.js) that installs Python CLI tools with
+Node.js) that installs Python command-line tools with
 [pipx](https://github.com/pypa/pipx) inside a GitHub Actions workflow, with
 GitHub Actions cache support so repeat runs skip reinstalling. It's published to
 the GitHub Marketplace as `python-build-tools/pipx-install-action` and consumed
 via `uses:` in other repos' workflows — there is no server/deploy step, just
-tagged releases of this repo.
+tagged releases of this repository.
 
 ## Stack summary
 
@@ -20,9 +20,9 @@ tagged releases of this repo.
 | Testing         | Jest (`__tests__/*.test.js`), coverage badge generated to `badges/coverage.svg`                                                                   |
 | Infrastructure  | None — runs entirely on GitHub-hosted runners via the `runs.using: node24` runtime in `action.yml`                                                |
 
-## Repo map
+## Repository map
 
-```
+```text
 .
 ├── action.yml              # Action metadata: inputs, runs.using (node24), main: dist/index.js
 ├── src/
@@ -36,7 +36,7 @@ tagged releases of this repo.
 ├── .github/workflows/
 │   ├── ci.yml                 # Unit tests + lint/format + end-to-end action smoke test
 │   ├── check-dist.yml          # Rebuilds dist/ and fails if the committed copy differs
-│   ├── linter.yml               # super-linter over the whole repo (dist/ excluded)
+│   ├── linter.yml               # super-linter over the whole repository (dist/ excluded)
 │   ├── codeql-analysis.yml       # CodeQL static analysis
 │   └── jekyll-gh-pages.yml        # Docs site deploy (unrelated to action correctness)
 ├── .github/dependabot.yml    # Weekly npm + github-actions update groups
@@ -57,9 +57,9 @@ npm run all            # format:write + lint + test + package — run this befor
 npm run act-test       # exercise __tests__/data workflow fixtures via `act`, if installed
 ```
 
-This repo requires **Node.js >= 24** (`engines.node` in `package.json`, matching
-`runs.using: node24` in `action.yml`). If multiple Node versions are managed
-locally (e.g. via `fnm`), switch to 24 before running any of the above.
+This repository requires **Node.js >= 24** (`engines.node` in `package.json`,
+matching `runs.using: node24` in `action.yml`). If multiple Node versions are
+managed locally (e.g. via `fnm`), switch to 24 before running any of the above.
 
 ## CI/CD and required checks
 
@@ -71,8 +71,8 @@ locally (e.g. via `fnm`), switch to 24 before running any of the above.
   most commonly fails** — it fails on _any_ PR (Dependabot or human) that
   changes `src/` or a dependency affecting the bundle without regenerating
   `dist/`.
-- **`linter.yml`** (PR + push to `main`): super-linter over the repo, excluding
-  `dist/`.
+- **`linter.yml`** (PR + push to `main`): super-linter over the repository,
+  excluding `dist/`.
 - **`codeql-analysis.yml`** (PR + push to `main` + weekly cron): CodeQL scan for
   the `javascript` language.
 - **`jekyll-gh-pages.yml`** (push to `main`): deploys the docs site; unrelated
@@ -82,7 +82,7 @@ locally (e.g. via `fnm`), switch to 24 before running any of the above.
 
 - **Always run `npm run all` before committing** any change to `src/`,
   `package.json`, or `package-lock.json`. `dist/index.js` and
-  `badges/coverage.svg` are generated artifacts committed to the repo —
+  `badges/coverage.svg` are generated artifacts committed to the repository —
   `check-dist.yml` enforces that `dist/` matches a fresh build.
 - **Do not bump `@actions/core` past `^2.x`, `@actions/cache` past `^5.x`, or
   `@actions/exec` past `^2.x`** without first migrating `src/` and `__tests__/`
@@ -93,10 +93,10 @@ locally (e.g. via `fnm`), switch to 24 before running any of the above.
   `RELEASES.md` on GitHub before accepting a major-version bump for anything
   under `@actions/*`.
 - Don't add a dependency, or a `require()`/`import` of one, without actually
-  using it. This repo previously carried an unused `@actions/github` import
-  (dead since the original template scaffold) and an unused `prettier-eslint`
-  devDependency — both did nothing but accumulate Dependabot security alerts for
-  years. Prefer deleting dead imports over upgrading them.
+  using it. This repository previously carried an unused `@actions/github`
+  import (dead since the original template scaffold) and an unused
+  `prettier-eslint` devDependency — both did nothing but accumulate Dependabot
+  security alerts for years. Prefer deleting dead imports over upgrading them.
 - Check the GitHub Advisory Database (or `npm audit`) before adding or upgrading
   a dependency, and don't just take the highest version `npm audit fix --force`
   offers — verify it doesn't cross a breaking-change boundary like the one
@@ -110,21 +110,21 @@ locally (e.g. via `fnm`), switch to 24 before running any of the above.
 1. **Hand-editing `dist/index.js`.** It's generated by `npm run package`. Any
    manual edit is silently discarded the next time someone runs the build, and
    the diff will fail `check-dist.yml` review in the meantime.
-2. **Forgetting to rebuild `dist/` before committing.** This is the single most
+1. **Forgetting to rebuild `dist/` before committing.** This is the single most
    common reason a PR fails CI here — including Dependabot's own PRs, since
    Dependabot never runs `npm run package` after bumping a dependency.
-3. **Accepting a Dependabot major-version bump for an `@actions/*` toolkit
+1. **Accepting a Dependabot major-version bump for an `@actions/*` toolkit
    package without checking for an ESM-only breaking change.** See Constraints
    above — this silently breaks the action at runtime (`ERR_REQUIRE_ESM`), which
    the test suite may not catch if the module is mocked in tests rather than
    exercised for real.
-4. **Running against an older local Node version.** `engines.node` requires
+1. **Running against an older local Node version.** `engines.node` requires
    `>=24`; older versions may pass tests locally but don't match the `node24`
    runtime GitHub Actions uses to execute `dist/index.js`.
-5. **Trusting `npm audit fix --force` output as-is.** It optimizes purely for
+1. **Trusting `npm audit fix --force` output as-is.** It optimizes purely for
    "no known vulnerabilities" and will happily select a major version that
-   breaks the module system for this repo. Cross-check against each package's
-   changelog first.
+   breaks the module system for this repository. Cross-check against each
+   package's changelog first.
 
 ## Links
 
@@ -135,5 +135,5 @@ locally (e.g. via `fnm`), switch to 24 before running any of the above.
 - [.github/workflows/codeql-analysis.yml](../.github/workflows/codeql-analysis.yml)
 - [.github/dependabot.yml](../.github/dependabot.yml)
 
-Trust these instructions first; search the repo only when something is missing
-or incorrect.
+Trust these instructions first; search the repository only when something is
+missing or incorrect.
