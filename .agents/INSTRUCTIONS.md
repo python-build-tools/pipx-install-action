@@ -144,6 +144,24 @@ managed locally (e.g. via `fnm`), switch to 24 before running any of the above.
    directly:
    `env 'INPUT_INSTALL-CONFIG-FILE=__tests__/data/pyproject.empty.toml' node dist/index.js`,
    which should print `Nothing to install.` and exit 0.
+1. **Changing the rollup `commonjs()` options, especially dropping
+   `ignoreTryCatch: false`.** Bundled dependencies probe for optional modules
+   with `require()` inside a try/catch (minimatch resolves `path` that way;
+   undici probes `node:http2` and `node:crypto`). In an ESM bundle `require` is
+   undefined, so without that option the throw is swallowed and the dependency
+   silently takes a degraded fallback — no error, no failed build. That is what
+   made minimatch use `sep: '/'`, which stops Windows paths from matching and
+   broke `@actions/cache`'s `saveCache` on `windows-latest` only, while Ubuntu
+   passed. `__tests__/dist.test.js` guards against it; don't delete that test.
+1. **Assuming a green `GitHub Actions Test` job proves the cache logic works.**
+   Both OS jobs restore from cache when a matching key exists, which skips
+   `saveCache` entirely — so a run can pass without ever exercising the save
+   path. The cache key includes `ImageVersion`, so misses (and therefore saves)
+   only happen after a runner-image roll. To test the save path deliberately,
+   temporarily add a salt to `systemHashInput` in `pipx-install.js`, rebuild
+   `dist/`, and push to a throwaway branch with a PR (`ci.yml` only triggers on
+   `pull_request` and pushes to `main`). Expect the unit tests to fail while the
+   salt is present — they assert exact cache-key hashes.
 1. **Running against an older local Node version.** `engines.node` requires
    `>=24`; older versions may pass tests locally but don't match the `node24`
    runtime GitHub Actions uses to execute `dist/index.js`.

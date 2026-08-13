@@ -4,6 +4,7 @@ import * as crypto from 'crypto';
 import * as fs from 'fs';
 import { promises, writeFileSync, existsSync } from 'fs';
 import * as path from 'path';
+import path__default from 'path';
 import * as http from 'http';
 import http__default from 'http';
 import * as https from 'https';
@@ -29,22 +30,23 @@ import zlib from 'node:zlib';
 import require$$5$1 from 'node:perf_hooks';
 import require$$8$1 from 'node:util/types';
 import require$$1$1 from 'node:worker_threads';
+import require$$10, { createHmac } from 'node:crypto';
+import require$$5$2 from 'node:http2';
 import require$$1$2 from 'node:url';
-import require$$5$2 from 'node:async_hooks';
+import require$$5$3 from 'node:async_hooks';
 import require$$1$3 from 'node:console';
 import require$$1$4 from 'node:dns';
-import require$$5$3, { StringDecoder } from 'string_decoder';
+import require$$5$4, { StringDecoder } from 'string_decoder';
 import * as child from 'child_process';
 import { setTimeout as setTimeout$1 } from 'timers';
 import * as stream from 'stream';
 import stream__default, { Readable } from 'stream';
-import require$$5$4, { URL as URL$1 } from 'url';
+import require$$5$5, { URL as URL$1 } from 'url';
 import * as buffer from 'buffer';
 import { Buffer as Buffer$1 } from 'buffer';
 import os$1, { EOL as EOL$1 } from 'node:os';
 import process$1 from 'node:process';
 import https$1 from 'node:https';
-import crypto$1, { createHmac } from 'node:crypto';
 import require$$1$5 from 'tty';
 import fs$1 from 'node:fs';
 import fs$2 from 'node:fs/promises';
@@ -5658,7 +5660,7 @@ function requireUtil$6 () {
 	/** @type {import('crypto')} */
 	let crypto;
 	try {
-	  crypto = require('node:crypto');
+	  crypto = require$$10;
 	  const possibleRelevantHashes = ['sha256', 'sha384', 'sha512'];
 	  supportedHashes = crypto.getHashes().filter((hash) => possibleRelevantHashes.includes(hash));
 	/* c8 ignore next 3 */
@@ -8194,7 +8196,7 @@ function requireBody () {
 	let random;
 
 	try {
-	  const crypto = require('node:crypto');
+	  const crypto = require$$10;
 	  random = (max) => crypto.randomInt(0, max);
 	} catch {
 	  random = (max) => Math.floor(Math.random(max));
@@ -10251,7 +10253,7 @@ function requireClientH2 () {
 	/** @type {import('http2')} */
 	let http2;
 	try {
-	  http2 = require('node:http2');
+	  http2 = require$$5$2;
 	} catch {
 	  // @ts-ignore
 	  http2 = { constants: {} };
@@ -14091,7 +14093,7 @@ function requireApiRequest () {
 	const { InvalidArgumentError, RequestAbortedError } = requireErrors();
 	const util = requireUtil$7();
 	const { getResolveErrorBodyCallback } = requireUtil$5();
-	const { AsyncResource } = require$$5$2;
+	const { AsyncResource } = require$$5$3;
 
 	class RequestHandler extends AsyncResource {
 	  constructor (opts, callback) {
@@ -14379,7 +14381,7 @@ function requireApiStream () {
 	const { InvalidArgumentError, InvalidReturnValueError } = requireErrors();
 	const util = requireUtil$7();
 	const { getResolveErrorBodyCallback } = requireUtil$5();
-	const { AsyncResource } = require$$5$2;
+	const { AsyncResource } = require$$5$3;
 	const { addSignal, removeSignal } = requireAbortSignal();
 
 	class StreamHandler extends AsyncResource {
@@ -14613,7 +14615,7 @@ function requireApiPipeline () {
 	  RequestAbortedError
 	} = requireErrors();
 	const util = requireUtil$7();
-	const { AsyncResource } = require$$5$2;
+	const { AsyncResource } = require$$5$3;
 	const { addSignal, removeSignal } = requireAbortSignal();
 	const assert = require$$0$2;
 
@@ -14862,7 +14864,7 @@ function requireApiUpgrade () {
 	hasRequiredApiUpgrade = 1;
 
 	const { InvalidArgumentError, SocketError } = requireErrors();
-	const { AsyncResource } = require$$5$2;
+	const { AsyncResource } = require$$5$3;
 	const util = requireUtil$7();
 	const { addSignal, removeSignal } = requireAbortSignal();
 	const assert = require$$0$2;
@@ -14978,7 +14980,7 @@ function requireApiConnect () {
 	hasRequiredApiConnect = 1;
 
 	const assert = require$$0$2;
-	const { AsyncResource } = require$$5$2;
+	const { AsyncResource } = require$$5$3;
 	const { InvalidArgumentError, SocketError } = requireErrors();
 	const util = requireUtil$7();
 	const { addSignal, removeSignal } = requireAbortSignal();
@@ -21847,7 +21849,7 @@ function requireUtil$4 () {
 	const { getEncoding } = requireEncoding();
 	const { serializeAMimeType, parseMIMEType } = requireDataUrl();
 	const { types } = require$$0$5;
-	const { StringDecoder } = require$$5$3;
+	const { StringDecoder } = require$$5$4;
 	const { btoa } = require$$0$1;
 
 	/** @type {PropertyDescriptor} */
@@ -25341,7 +25343,7 @@ function requireFrame () {
 	let bufIdx = BUFFER_SIZE;
 
 	try {
-	  crypto = require('node:crypto');
+	  crypto = require$$10;
 	/* c8 ignore next 3 */
 	} catch {
 	  crypto = {
@@ -25455,7 +25457,7 @@ function requireConnection () {
 	/** @type {import('crypto')} */
 	let crypto;
 	try {
-	  crypto = require('node:crypto');
+	  crypto = require$$10;
 	/* c8 ignore next 3 */
 	} catch {
 
@@ -30786,7 +30788,7 @@ function requireMinimatch () {
 	minimatch_1 = minimatch;
 	minimatch.Minimatch = Minimatch;
 
-	var path = (function () { try { return require('path') } catch (e) {}}()) || {
+	var path = (function () { try { return path__default } catch (e) {}}()) || {
 	  sep: '/'
 	};
 	minimatch.sep = path.sep;
@@ -38963,7 +38965,7 @@ function requireDist$1 () {
 	const assert_1 = __importDefault(assert$1);
 	const debug_1 = __importDefault(requireSrc());
 	const agent_base_1 = requireDist$2();
-	const url_1 = require$$5$4;
+	const url_1 = require$$5$5;
 	const parse_proxy_response_1 = requireParseProxyResponse();
 	const debug = (0, debug_1.default)('https-proxy-agent');
 	const setServernameFromNonIpHost = (options) => {
@@ -39154,7 +39156,7 @@ function requireDist () {
 	const debug_1 = __importDefault(requireSrc());
 	const events_1 = events__default;
 	const agent_base_1 = requireDist$2();
-	const url_1 = require$$5$4;
+	const url_1 = require$$5$5;
 	const debug = (0, debug_1.default)('http-proxy-agent');
 	/**
 	 * The `HttpProxyAgent` implements an HTTP Agent subclass that connects
@@ -85203,7 +85205,7 @@ async function getInstalledPackageMetadata(packageName) {
 }
 
 function hashObject(value) {
-  return crypto$1.createHash('sha256').update(JSON.stringify(value)).digest('hex')
+  return require$$10.createHash('sha256').update(JSON.stringify(value)).digest('hex')
 }
 
 async function createCommandSymlinks(packageName, pipxBinDir) {

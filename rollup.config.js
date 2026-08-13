@@ -17,7 +17,14 @@ const config = {
     sourcemap: false
   },
   plugins: [
-    commonjs(),
+    // ignoreTryCatch: false is required. Several bundled dependencies probe for
+    // optional modules with require() inside a try/catch — minimatch resolves
+    // `path` that way. By default this plugin leaves those requires alone, and
+    // in an ESM bundle `require` is undefined, so the throw is swallowed and the
+    // dependency silently takes its fallback path. That made minimatch use
+    // `sep: '/'`, which stops Windows paths from matching and broke
+    // @actions/cache's saveCache on windows-latest only. See __tests__/dist.test.js.
+    commonjs({ ignoreTryCatch: false }),
     // Required, and absent from the upstream actions/javascript-action config:
     // @actions/cache imports its own package.json, and the build fails without
     // this plugin.
