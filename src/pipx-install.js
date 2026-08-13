@@ -1,21 +1,17 @@
-const core = require('@actions/core')
-const { saveCache, restoreCache } = require('@actions/cache')
-const { exec, getExecOutput } = require('@actions/exec')
+import * as core from '@actions/core'
+import { saveCache, restoreCache } from '@actions/cache'
+import { exec, getExecOutput } from '@actions/exec'
 
-const fs = require('fs/promises')
-const path = require('path')
-const crypto = require('crypto')
+import fs from 'node:fs/promises'
+import path from 'node:path'
+import crypto from 'node:crypto'
 
-const TOML = require('@iarna/toml')
-const semver = require('semver')
-
-module.exports = {
-  pipxInstall
-}
+import TOML from '@iarna/toml'
+import semver from 'semver'
 
 const MIN_PIPX_VERSION = '1.1.0'
 
-async function pipxInstall(options) {
+export async function pipxInstall(options) {
   const { installConfigFile, cachePackages } = options
   core.info(`Reading ${installConfigFile}...`)
 

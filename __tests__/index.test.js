@@ -1,17 +1,16 @@
 /**
  * Unit tests for the action's entrypoint, src/index.js
  */
+import { jest } from '@jest/globals'
 
-const { run } = require('../src/main')
+const run = jest.fn()
 
-// Mock the action's entrypoint
-jest.mock('../src/main', () => ({
-  run: jest.fn()
-}))
+// Mocks must be registered before the module under test is imported.
+jest.unstable_mockModule('../src/main.js', () => ({ run }))
 
 describe('index', () => {
   it('calls run when imported', async () => {
-    require('../src/index')
+    await import('../src/index.js')
 
     expect(run).toHaveBeenCalled()
   })

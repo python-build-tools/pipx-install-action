@@ -3,6 +3,7 @@
   "description": "GitHub Action that installs Python CLI packages with pipx",
   "version": "1.0.0",
   "author": "",
+  "type": "module",
   "private": true,
   "homepage": "https://github.com/python-build-tools/pipx-install-action",
   "repository": {
@@ -25,13 +26,13 @@
   },
   "scripts": {
     "bundle": "npm run format:write && npm run package",
-    "ci-test": "jest",
+    "ci-test": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 jest",
     "format:write": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "npx eslint .",
     "package": "ncc build src/index.js --license licenses.txt",
     "package:watch": "npm run package -- --watch",
-    "test": "(jest && make-coverage-badge --output-path ./badges/coverage.svg) || make-coverage-badge --output-path ./badges/coverage.svg",
+    "test": "(NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 jest && make-coverage-badge --output-path ./badges/coverage.svg) || make-coverage-badge --output-path ./badges/coverage.svg",
     "all": "npm run format:write && npm run lint && npm run test && npm run package",
     "act-test": "act --workflows __tests__/data/"
   },
@@ -64,9 +65,9 @@
     ]
   },
   "dependencies": {
-    "@actions/cache": "^5.2.0",
-    "@actions/core": "^2.0.3",
-    "@actions/exec": "^2.0.0",
+    "@actions/cache": "^6.2.0",
+    "@actions/core": "^3.0.1",
+    "@actions/exec": "^3.0.0",
     "@iarna/toml": "^2.2.5",
     "semver": "^7.7.2"
   },
@@ -75,6 +76,7 @@
     "@babel/eslint-parser": "^7.28.4",
     "@babel/preset-env": "^7.28.3",
     "@eslint/compat": "^2.1.0",
+    "@jest/globals": "^30.4.1",
     "@vercel/ncc": "^0.44.1",
     "babel-preset-jest": "^29.6.3",
     "eslint": "^9.35.0",

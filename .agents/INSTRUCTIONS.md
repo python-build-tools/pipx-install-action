@@ -2,8 +2,8 @@
 
 ## What this repository is
 
-`pipx-install-action` is a GitHub Action (plain JavaScript/CommonJS, run on
-Node.js) that installs Python command-line tools with
+`pipx-install-action` is a GitHub Action (plain JavaScript/ESM, run on Node.js)
+that installs Python command-line tools with
 [pipx](https://github.com/pypa/pipx) inside a GitHub Actions workflow, with
 GitHub Actions cache support so repeat runs skip reinstalling. It's published to
 the GitHub Marketplace as `python-build-tools/pipx-install-action` and consumed
@@ -14,7 +14,7 @@ tagged releases of this repository.
 
 | Aspect          | Detail                                                                                                                                            |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Language        | JavaScript, CommonJS (`require`/`module.exports`), no TypeScript                                                                                  |
+| Language        | JavaScript, native ESM (`import`/`export`, `"type": "module"`), no TypeScript                                                                     |
 | Package manager | npm (`package-lock.json` committed)                                                                                                               |
 | Build/package   | [`@vercel/ncc`](https://github.com/vercel/ncc) bundles `src/index.js` into the single committed `dist/index.js` that GitHub Actions actually runs |
 | Testing         | Jest (`__tests__/*.test.js`), coverage badge generated to `badges/coverage.svg`                                                                   |
@@ -91,14 +91,25 @@ managed locally (e.g. via `fnm`), switch to 24 before running any of the above.
   `package.json`, or `package-lock.json`. `dist/index.js` and
   `badges/coverage.svg` are generated artifacts committed to the repository —
   `check-dist.yml` enforces that `dist/` matches a fresh build.
-- **Do not bump `@actions/core` past `^2.x`, `@actions/cache` past `^5.x`, or
-  `@actions/exec` past `^2.x`** without first migrating `src/` and `__tests__/`
-  off CommonJS. Those packages went **ESM-only** at `@actions/core@3.0.0`,
-  `@actions/cache@6.0.0`, and `@actions/exec@3.0.0` respectively (`require()` of
-  them throws at runtime). Dependabot and `npm audit fix --force` do not know
-  this and will cheerfully propose the breaking major — check each package's
-  `RELEASES.md` on GitHub before accepting a major-version bump for anything
-  under `@actions/*`.
+- **This repository is native ESM** (`"type": "module"`). Never reintroduce
+  `require()`, `module.exports`, or `__dirname` into `src/` or `__tests__/`.
+  Relative imports need explicit `.js` extensions (`./main.js`, not `./main`),
+  Node builtins use `node:` prefixes, and the `__dirname` replacement is
+  `path.dirname(fileURLToPath(import.meta.url))` — not `import.meta.dirname`,
+  which Jest's `import.meta` does not reliably populate. `@actions/core`,
+  `@actions/cache`, and `@actions/exec` are ESM-only from `3.x`, `6.x`, and
+  `3.x` onward, so this is load-bearing rather than stylistic.
+- **Mock modules in tests with `jest.unstable_mockModule` and a fixture in
+  `__fixtures__/`**, never `jest.spyOn(someModule, 'export')` — ESM module
+  namespace objects are frozen, so `spyOn` throws on them. Two rules for
+  fixtures: register the mock _before_ the module under test is imported (so the
+  import must be a dynamic `await import(...)`), and if any other dependency
+  also imports the module you are mocking, the fixture must `export *` the real
+  module and override only the functions under assertion. `__fixtures__/core.js`
+  does exactly this because `@actions/cache` imports named exports from
+  `@actions/core` (`setSecret` among them) and a narrower mock breaks it.
+  `__fixtures__/fs-promises.js` does the same to keep `readFile` real while
+  mocking `symlink` and `stat`.
 - Don't add a dependency, or a `require()`/`import` of one, without actually
   using it. This repository previously carried an unused `@actions/github`
   import (dead since the original template scaffold) and an unused
@@ -120,11 +131,13 @@ managed locally (e.g. via `fnm`), switch to 24 before running any of the above.
 1. **Forgetting to rebuild `dist/` before committing.** This is the single most
    common reason a PR fails CI here — including Dependabot's own PRs, since
    Dependabot never runs `npm run package` after bumping a dependency.
-1. **Accepting a Dependabot major-version bump for an `@actions/*` toolkit
-   package without checking for an ESM-only breaking change.** See Constraints
-   above — this silently breaks the action at runtime (`ERR_REQUIRE_ESM`), which
-   the test suite may not catch if the module is mocked in tests rather than
-   exercised for real.
+1. **Reintroducing CommonJS.** `require()` in `src/` throws
+   `ReferenceError: require is not defined in ES module scope` the moment the
+   bundle runs, and the `@actions/*` toolkit packages are ESM-only at their
+   current majors. The fastest way to prove a bundle still loads is to run it
+   directly:
+   `env 'INPUT_INSTALL-CONFIG-FILE=__tests__/data/pyproject.empty.toml' node dist/index.js`,
+   which should print `Nothing to install.` and exit 0.
 1. **Running against an older local Node version.** `engines.node` requires
    `>=24`; older versions may pass tests locally but don't match the `node24`
    runtime GitHub Actions uses to execute `dist/index.js`.

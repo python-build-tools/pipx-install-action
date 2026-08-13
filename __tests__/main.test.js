@@ -1,25 +1,22 @@
 /**
  * Unit tests for the action's main functionality, src/main.js
  */
-const path = require('path')
-const fs = require('fs')
-const core = require('@actions/core')
-const yaml = require('js-yaml')
-const main = require('../src/main')
+import { jest } from '@jest/globals'
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import yaml from 'js-yaml'
 
-// Mock the GitHub Actions core library
-const infoMock = jest.spyOn(core, 'info').mockImplementation()
-const getInputMock = jest.spyOn(core, 'getInput').mockImplementation()
-const setFailedMock = jest.spyOn(core, 'setFailed').mockImplementation()
-const setOutputMock = jest.spyOn(core, 'setOutput').mockImplementation()
+import * as core from '../__fixtures__/core.js'
 
-// Mock the action's main function
-const runMock = jest.spyOn(main, 'run')
+jest.unstable_mockModule('@actions/core', () => core)
 
-const testDataDir = path.join(__dirname, 'data')
+const main = await import('../src/main.js')
+
+const dirname = path.dirname(fileURLToPath(import.meta.url))
+const testDataDir = path.join(dirname, 'data')
 const emptyPyprojectFile = path.join(testDataDir, 'pyproject.empty.toml')
-
-const actionYmlFile = path.join(__dirname, '..', 'action.yml')
+const actionYmlFile = path.join(dirname, '..', 'action.yml')
 
 describe('action', () => {
   const inputsDefaults = {}
@@ -38,7 +35,7 @@ describe('action', () => {
     }
 
     // Mock the action's inputs
-    getInputMock.mockImplementation((name) => {
+    core.getInput.mockImplementation((name) => {
       return inputs[name]
     })
   })
@@ -46,8 +43,7 @@ describe('action', () => {
   it('logs if nothing to do', async () => {
     await main.run()
 
-    expect(runMock).toHaveReturned()
-    expect(infoMock).toHaveBeenCalledWith('Nothing to install.')
+    expect(core.info).toHaveBeenCalledWith('Nothing to install.')
   })
 
   it('sets a failed status', async () => {
@@ -55,8 +51,7 @@ describe('action', () => {
 
     await main.run()
 
-    expect(runMock).toHaveReturned()
-    expect(setFailedMock).toHaveBeenCalledWith(
+    expect(core.setFailed).toHaveBeenCalledWith(
       "ENOENT: no such file or directory, open 'failfail.fail'"
     )
   })

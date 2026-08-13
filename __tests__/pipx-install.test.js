@@ -1,23 +1,25 @@
-const path = require('path')
-const fs = require('fs/promises')
+import { jest } from '@jest/globals'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const actionsCache = require('@actions/cache')
-const actionsExec = require('@actions/exec')
-const core = require('@actions/core')
+import * as core from '../__fixtures__/core.js'
+import * as actionsCache from '../__fixtures__/cache.js'
+import * as actionsExec from '../__fixtures__/exec.js'
+import * as fsPromises from '../__fixtures__/fs-promises.js'
 
-const infoMock = jest.spyOn(core, 'info').mockImplementation()
+jest.unstable_mockModule('@actions/core', () => core)
+jest.unstable_mockModule('@actions/cache', () => actionsCache)
+jest.unstable_mockModule('@actions/exec', () => actionsExec)
+jest.unstable_mockModule('node:fs/promises', () => fsPromises)
 
-const saveCacheMock = jest.spyOn(actionsCache, 'saveCache').mockImplementation()
-const restoreCacheMock = jest
-  .spyOn(actionsCache, 'restoreCache')
-  .mockImplementation()
+const { pipxInstall } = await import('../src/pipx-install.js')
 
-const execMock = jest.spyOn(actionsExec, 'exec').mockImplementation()
-const getExecOutputMock = jest
-  .spyOn(actionsExec, 'getExecOutput')
-  .mockImplementation()
+const { saveCache, restoreCache } = actionsCache
+const { exec, getExecOutput } = actionsExec
+const { symlink, stat } = fsPromises
 
-const testDataDir = path.join(__dirname, 'data')
+const dirname = path.dirname(fileURLToPath(import.meta.url))
+const testDataDir = path.join(dirname, 'data')
 const packageSpecRegExp = new RegExp('(\\w+)(~=|===|==|!=|<=|>=|<|>)?')
 
 function getPyprojectFile(name) {
@@ -25,7 +27,6 @@ function getPyprojectFile(name) {
 }
 
 describe('pipx-install', () => {
-  const { pipxInstall } = require('../src/pipx-install')
   const originalEnv = process.env
   let pipxVersion
   let cache = {}
@@ -82,10 +83,15 @@ describe('pipx-install', () => {
       return { stdout }
     }
 
-    getExecOutputMock.mockImplementation(mockExec)
-    execMock.mockImplementation(mockExec)
+    getExecOutput.mockImplementation(mockExec)
+    exec.mockImplementation(mockExec)
 
-    restoreCacheMock.mockImplementation(async (paths, cacheKey) => {
+    // The real fs.stat used to throw for the fake shared-libs directory, so the
+    // default mock must reject to preserve that behavior.
+    stat.mockRejectedValue(new Error('ENOENT: no such file or directory'))
+    symlink.mockResolvedValue(undefined)
+
+    restoreCache.mockImplementation(async (paths, cacheKey) => {
       const cacheValue = cache[cacheKey]
       if (cacheValue) {
         cacheValue()
@@ -108,37 +114,34 @@ describe('pipx-install', () => {
       cachePackages: true
     })
 
-    expect(execMock).toHaveBeenNthCalledWith(1, 'pipx', [
+    expect(exec).toHaveBeenNthCalledWith(1, 'pipx', [
       'install',
       'poetry==1.7.1'
     ])
-    expect(execMock).toHaveBeenNthCalledWith(2, 'pipx', [
+    expect(exec).toHaveBeenNthCalledWith(2, 'pipx', [
       'inject',
       'poetry',
       'poetry-plugin-bundle==1.3.0'
     ])
-    expect(execMock).toHaveBeenNthCalledWith(3, 'pipx', [
-      'install',
-      'tox~=4.11.4'
-    ])
-    expect(execMock).toHaveBeenNthCalledWith(4, 'pipx', [
+    expect(exec).toHaveBeenNthCalledWith(3, 'pipx', ['install', 'tox~=4.11.4'])
+    expect(exec).toHaveBeenNthCalledWith(4, 'pipx', [
       'install',
       'poethepoet~=0.24.4'
     ])
 
-    expect(saveCacheMock).toHaveBeenCalledWith(
+    expect(saveCache).toHaveBeenCalledWith(
       ['PIPX_LOCAL_VENVS-FAKE-VALUE/poetry'],
       'pipx-install-poetry-fe16d3d2c69628638a1e4cede2e1ed8b44619ad00b3dad98493652e204383c8b'
     )
-    expect(saveCacheMock).toHaveBeenCalledWith(
+    expect(saveCache).toHaveBeenCalledWith(
       ['PIPX_LOCAL_VENVS-FAKE-VALUE/tox'],
       'pipx-install-tox-c53f41cc5ca935c7b3e1d3312d4bd41f9130f9e6c361b33802f40261c3d64e97'
     )
-    expect(saveCacheMock).toHaveBeenCalledWith(
+    expect(saveCache).toHaveBeenCalledWith(
       ['PIPX_LOCAL_VENVS-FAKE-VALUE/poethepoet'],
       'pipx-install-poethepoet-427ca9496a47ed76de68a487e77542aa2cd93fe734a44fd9cd728bc5e56b1737'
     )
-    expect(saveCacheMock).toHaveBeenCalledWith(
+    expect(saveCache).toHaveBeenCalledWith(
       ['PIPX_SHARED_LIBS-FAKE-VALUE'],
       'pipx-install-shared-bd4b048a3dc2a3c8de88799b9460bf8744c2a674ef52b677d2ecd776d05a50e7'
     )
@@ -150,15 +153,13 @@ describe('pipx-install', () => {
       cachePackages: false
     })
 
-    expect(restoreCacheMock).not.toHaveBeenCalled()
-    expect(saveCacheMock).not.toHaveBeenCalled()
+    expect(restoreCache).not.toHaveBeenCalled()
+    expect(saveCache).not.toHaveBeenCalled()
   })
 
   it('installs using pipx (cache hit)', async () => {
     process.env.ImageVersion = '20250623.1.0'
     process.env.ImageOS = 'win22'
-
-    const symlinkMock = jest.spyOn(fs, 'symlink').mockImplementation()
 
     addCache(
       'pipx-install-shared-6338ae2714f1c71b9856ebb3020c43758486b409733e08d60eeb09a9290fdbd0'
@@ -174,12 +175,12 @@ describe('pipx-install', () => {
       installConfigFile: getPyprojectFile('pyproject.test2-cache-hit.toml'),
       cachePackages: true
     })
-    expect(execMock).not.toHaveBeenCalledWith('pipx', [
+    expect(exec).not.toHaveBeenCalledWith('pipx', [
       'install',
       'sometool==1.2.3'
     ])
-    expect(saveCacheMock).not.toHaveBeenCalled()
-    expect(symlinkMock).toHaveBeenCalledWith(
+    expect(saveCache).not.toHaveBeenCalled()
+    expect(symlink).toHaveBeenCalledWith(
       '/fake/path/to/sometool-app',
       'PIPX_BIN_DIR-FAKE-VALUE/sometool-app'
     )
@@ -207,22 +208,14 @@ describe('pipx-install', () => {
   })
 
   it('does not cache pipx shared/ if it already exists', async () => {
-    const statMock = jest
-      .spyOn(fs, 'stat')
-      .mockImplementation(async (statPath) => {
-        return {}
-      })
+    stat.mockResolvedValue({})
 
     await pipxInstall({
       installConfigFile: getPyprojectFile('pyproject.test1.toml'),
       cachePackages: true
     })
-    expect(restoreCacheMock).not.toHaveBeenCalledWith(
-      'PIPX_SHARED_LIBS-FAKE-VALUE'
-    )
-    expect(saveCacheMock).not.toHaveBeenCalledWith(
-      'PIPX_SHARED_LIBS-FAKE-VALUE'
-    )
-    expect(statMock).toHaveBeenCalledWith('PIPX_SHARED_LIBS-FAKE-VALUE')
+    expect(restoreCache).not.toHaveBeenCalledWith('PIPX_SHARED_LIBS-FAKE-VALUE')
+    expect(saveCache).not.toHaveBeenCalledWith('PIPX_SHARED_LIBS-FAKE-VALUE')
+    expect(stat).toHaveBeenCalledWith('PIPX_SHARED_LIBS-FAKE-VALUE')
   })
 })
