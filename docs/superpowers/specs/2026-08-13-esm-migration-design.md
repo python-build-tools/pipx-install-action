@@ -144,14 +144,27 @@ license plugin overwrites at the same path.
 
 ```js
 plugins: [
-  commonjs(),
+  commonjs({ ignoreTryCatch: false }),
   json(),
   nodeResolve({ preferBuiltins: true }),
   license({ thirdParty: { output: 'dist/licenses.txt' } })
 ]
 ```
 
-Two deliberate deviations from the upstream template's configuration:
+Three deliberate deviations from the upstream template's configuration:
+
+- **`commonjs({ ignoreTryCatch: false })` is required.** Found during
+  implementation, not design. Several bundled dependencies probe for optional
+  modules with `require()` inside a try/catch — minimatch resolves `path` that
+  way, and undici probes `node:http2` and `node:crypto`. This plugin leaves
+  those requires untouched by default, and in an ESM bundle `require` is
+  undefined, so the throw is swallowed and each dependency silently takes a
+  degraded fallback. minimatch fell back to `sep: '/'`, which stopped Windows
+  paths from matching and made `@actions/cache`'s `saveCache` fail on
+  `windows-latest` only, with Ubuntu unaffected because `sep` is `/` there
+  anyway. This was a regression from ncc, which rewrites try/catch requires into
+  its own module registry; it was not caused by the `@actions/cache` major.
+  `__tests__/dist.test.js` guards the invariant.
 
 - **`@rollup/plugin-json` is required.** It is absent upstream, where the only
   dependency is `@actions/core`. Here, `@actions/cache` imports its own
