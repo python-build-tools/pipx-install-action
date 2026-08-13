@@ -58,7 +58,7 @@ Three points that are not purely mechanical:
   relying on function hoisting. That block is deleted and `pipxInstall` gains an
   inline `export`.
 
-Node builtins move to `node:`-prefixed specifiers (`node:fs/promises`,
+Node built-ins move to `node:`-prefixed specifiers (`node:fs/promises`,
 `node:path`, `node:crypto`).
 
 ## Test migration (`__tests__/`)
@@ -156,10 +156,10 @@ Two deliberate deviations from the upstream template's configuration:
 - **`@rollup/plugin-json` is required.** It is absent upstream, where the only
   dependency is `@actions/core`. Here, `@actions/cache` imports its own
   `package.json`, and the build fails outright without this plugin.
-- **`sourcemap: false`.** The generated sourcemap is roughly 16.5 MB. Because
+- **`sourcemap: false`.** The generated source map is roughly 16.5 MB. Because
   `dist/` is committed, enabling it would add that volume to git history on
   every dependency bump and would bury the `dist/` diff that `check-dist.yml`
-  reports. With sourcemaps off, `dist/` keeps exactly the two files it holds
+  reports. With source maps off, `dist/` keeps exactly the two files it holds
   today, `index.js` and `licenses.txt`, so the migration introduces no new
   committed build artifacts.
 

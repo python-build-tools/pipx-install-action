@@ -99,7 +99,7 @@ managed locally (e.g. via `fnm`), switch to 24 before running any of the above.
 - **This repository is native ESM** (`"type": "module"`). Never reintroduce
   `require()`, `module.exports`, or `__dirname` into `src/` or `__tests__/`.
   Relative imports need explicit `.js` extensions (`./main.js`, not `./main`),
-  Node builtins use `node:` prefixes, and the `__dirname` replacement is
+  Node built-ins use `node:` prefixes, and the `__dirname` replacement is
   `path.dirname(fileURLToPath(import.meta.url))` — not `import.meta.dirname`,
   which Jest's `import.meta` does not reliably populate. `@actions/core`,
   `@actions/cache`, and `@actions/exec` are ESM-only from `3.x`, `6.x`, and
