@@ -37,8 +37,9 @@ tagged releases of this repository.
 │   ├── ci.yml                 # Unit tests + lint/format + end-to-end action smoke test
 │   ├── check-dist.yml          # Rebuilds dist/ and fails if the committed copy differs
 │   ├── linter.yml               # super-linter over the whole repository (dist/ excluded)
-│   ├── codeql-analysis.yml       # CodeQL static analysis
 │   └── jekyll-gh-pages.yml        # Docs site deploy (unrelated to action correctness)
+├── .github/codeql/codeql-config.yml  # paths-ignore (node_modules, dist) for CodeQL
+│                                      #   default setup — see CI/CD section below
 ├── .github/dependabot.yml    # Weekly npm + github-actions update groups
 └── package.json
 ```
@@ -73,10 +74,16 @@ managed locally (e.g. via `fnm`), switch to 24 before running any of the above.
   `dist/`.
 - **`linter.yml`** (PR + push to `main`): super-linter over the repository,
   excluding `dist/`.
-- **`codeql-analysis.yml`** (PR + push to `main` + weekly cron): CodeQL scan for
-  the `javascript` language.
 - **`jekyll-gh-pages.yml`** (push to `main`): deploys the docs site; unrelated
   to whether the action itself works.
+- **CodeQL** runs via GitHub's code scanning **default setup** (a repository
+  setting, not a checked-in workflow — there used to be a `codeql-analysis.yml`
+  "advanced setup" workflow here, but it was removed because it conflicted with
+  default setup: GitHub refuses advanced-config SARIF uploads for a language
+  default setup already owns, and it fails that way on every branch,
+  Dependabot's own PRs included). The `github-codeql-config-file` repository
+  property points default setup at `.github/codeql/codeql-config.yml` so `dist/`
+  and `node_modules` stay excluded from analysis.
 
 ## Constraints / hard rules
 
@@ -132,7 +139,9 @@ managed locally (e.g. via `fnm`), switch to 24 before running any of the above.
 - [.github/workflows/ci.yml](../.github/workflows/ci.yml)
 - [.github/workflows/check-dist.yml](../.github/workflows/check-dist.yml)
 - [.github/workflows/linter.yml](../.github/workflows/linter.yml)
-- [.github/workflows/codeql-analysis.yml](../.github/workflows/codeql-analysis.yml)
+- [.github/codeql/codeql-config.yml](../.github/codeql/codeql-config.yml) —
+  consumed by CodeQL default setup via the `github-codeql-config-file`
+  repository property
 - [.github/dependabot.yml](../.github/dependabot.yml)
 
 Trust these instructions first; search the repository only when something is
