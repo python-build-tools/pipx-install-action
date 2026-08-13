@@ -1,11 +1,11 @@
-const core = require('@actions/core')
-const { pipxInstall } = require('./pipx-install')
+import * as core from '@actions/core'
+import { pipxInstall } from './pipx-install.js'
 
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
  */
-async function run() {
+export async function run() {
   try {
     const installConfigFile = core.getInput('install-config-file')
     const cachePackages = core.getInput('cache-packages')
@@ -15,8 +15,4 @@ async function run() {
     // Fail the workflow step if an error occurs
     core.setFailed(error.message)
   }
-}
-
-module.exports = {
-  run
 }
