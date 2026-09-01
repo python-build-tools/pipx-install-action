@@ -5,7 +5,7 @@ import { jest } from '@jest/globals'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import yaml from 'js-yaml'
+import { load as loadYaml } from 'js-yaml'
 
 import * as core from '../__fixtures__/core.js'
 
@@ -20,7 +20,7 @@ const actionYmlFile = path.join(dirname, '..', 'action.yml')
 
 describe('action', () => {
   const inputsDefaults = {}
-  const actionYml = yaml.load(fs.readFileSync(actionYmlFile))
+  const actionYml = loadYaml(fs.readFileSync(actionYmlFile))
   for (const [inputName, inputConfig] of Object.entries(actionYml.inputs)) {
     inputsDefaults[inputName] = inputConfig.default
   }
