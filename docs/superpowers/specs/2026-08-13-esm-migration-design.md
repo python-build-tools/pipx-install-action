@@ -89,7 +89,7 @@ Two consequences deserve explicit note.
 **`pipx-install.test.js` needs a partial mock of `node:fs/promises`.** It mocks
 `symlink` and `stat` but relies on `readFile` being real so the TOML fixtures in
 `__tests__/data/` still load. `unstable_mockModule` replaces a whole module, so
-the fixture re-exports the real module and overrides only those two functions:
+the fixture reexports the real module and overrides only those two functions:
 
 ```js
 const real = await import('node:fs/promises')
@@ -170,7 +170,7 @@ Three deliberate deviations from the upstream template's configuration:
   dependency is `@actions/core`. Here, `@actions/cache` imports its own
   `package.json`, and the build fails outright without this plugin.
 - **`sourcemap: false`.** The generated source map is roughly 16.5 MB. Because
-  `dist/` is committed, enabling it would add that volume to git history on
+  `dist/` is committed, enabling it would add that volume to Git history on
   every dependency bump and would bury the `dist/` diff that `check-dist.yml`
   reports. With source maps off, `dist/` keeps exactly the two files it holds
   today, `index.js` and `licenses.txt`, so the migration introduces no new

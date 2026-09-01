@@ -19,15 +19,16 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # super-linter resolves the default branch with `git rev-parse`, so it
           # needs the full git history rather than a shallow clone.
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Setup Node.js
         id: setup-node
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: package.json
           cache: npm
@@ -38,11 +39,18 @@ jobs:
 
       - name: Lint Codebase
         id: super-linter
-        uses: super-linter/super-linter/slim@v8
+        uses: super-linter/super-linter/slim@4ce20838b8ab83717e78138c5b3a1407148e0918 # v8.7.0
         env:
           DEFAULT_BRANCH: main
-          FILTER_REGEX_EXCLUDE: dist/**/*
+          # This is a regex, not a glob: the previous value (dist/**/*) also
+          # matched check-dist.yml and excluded it from every linter.
+          FILTER_REGEX_EXCLUDE: ^dist/.*
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_ALL_CODEBASE: true
           VALIDATE_JSCPD: false
           VALIDATE_HTML: false
+          # Biome is a competing formatter/linter: it wants semicolons and
+          # double quotes, while .prettierrc.yml sets semi: false and
+          # singleQuote: true. Prettier and eslint are this repo's tools.
+          VALIDATE_BIOME_FORMAT: false
+          VALIDATE_BIOME_LINT: false

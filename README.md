@@ -2,7 +2,7 @@
 
 [![GitHub Super-Linter](https://github.com/python-build-tools/pipx-install-action/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
 ![CI](https://github.com/python-build-tools/pipx-install-action/actions/workflows/ci.yml/badge.svg)
-![Test Converage](https://raw.githubusercontent.com/python-build-tools/pipx-install-action/main/badges/coverage.svg)
+![Test Coverage](https://raw.githubusercontent.com/python-build-tools/pipx-install-action/main/badges/coverage.svg)
 
 This action installs Python tools using [pipx](https://github.com/pypa/pipx).
 
