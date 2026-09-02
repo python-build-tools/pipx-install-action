@@ -85241,7 +85241,7 @@ async function checkForPipxSharedPreExists(pipxSharedDir) {
   try {
     await fs$2.stat(pipxSharedDir);
     return true
-  } catch (error) {
+  } catch {
     return false
   }
 }

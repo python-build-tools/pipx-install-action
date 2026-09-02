@@ -16,7 +16,7 @@ inputs:
     description:
       When 'true', packages will be saved to the repository's GitHub Action
       cache and restored whenever possible to avoid downloading from the
-      upstream pacakge repository (eg. PyPI)
+      upstream package repository (eg. PyPI)
     default: true
 
 runs:

@@ -1,4 +1,8 @@
 on: push
+
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -16,11 +20,13 @@ jobs:
       - run: echo "/root/.local/bin" >> "$GITHUB_PATH"
 
       # Test the pipx-install action
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
       - run: cp __tests__/data/pyproject.test1.toml pyproject.toml
       - uses: './' # Run this repo's action.
 
-      # Comfirm that expected tools are installed and runnable.
+      # Confirm that expected tools are installed and runnable.
       - run: poetry --version
       - run: poetry bundle venv --help
       - run: tox --version
