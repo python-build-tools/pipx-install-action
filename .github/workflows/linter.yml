@@ -55,14 +55,6 @@ jobs:
           STRIP_DEFAULT_WORKSPACE_FOR_REGEX: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_ALL_CODEBASE: true
-          # ci.yml already runs `npm run lint`, which is this repo's eslint and
-          # this repo's eslint.config.mjs. super-linter cannot be pointed at that
-          # config instead: JAVASCRIPT_ES_CONFIG_FILE is shared with the JSON,
-          # JSONC and VUE linters, and our config has no JSON language support,
-          # so reusing it would silently stop linting JSON. Rather than lint JS
-          # twice under two different rule sets, defer to ci.yml and let
-          # super-linter keep its own config for JSON/JSONC.
-          VALIDATE_JAVASCRIPT_ES: false
           VALIDATE_JSCPD: false
           VALIDATE_HTML: false
           # Biome is a competing formatter/linter: it wants semicolons and
