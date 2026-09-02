@@ -48,8 +48,11 @@ jobs:
           # only logs a non-fatal 403 on every run.
           ENABLE_GITHUB_PULL_REQUEST_SUMMARY_COMMENT: false
           # This is a regex, not a glob: the previous value (dist/**/*) also
-          # matched check-dist.yml and excluded it from every linter.
+          # matched check-dist.yml and excluded it from every linter. Anchoring
+          # needs STRIP_DEFAULT_WORKSPACE_FOR_REGEX, because otherwise the regex
+          # is matched against /github/workspace/... and ^ never matches.
           FILTER_REGEX_EXCLUDE: ^dist/.*
+          STRIP_DEFAULT_WORKSPACE_FOR_REGEX: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_ALL_CODEBASE: true
           # ci.yml already runs `npm run lint`, which is this repo's eslint and
